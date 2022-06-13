@@ -43,12 +43,15 @@ As a user I can get the detail of one of the available PERTs
 > perty get 1
 Name: Marketplace
 
-Report:
++------------+------------+----------+-------------+-----------------+
+| Activity   | Optimistic | Probable | Pessimistic | PERT estimation |
++------------+------------+----------+-------------+-----------------+
+| activity 1 | 10         | 20       | 30          | 20              |
++------------+------------+----------+-------------+-----------------+
+| activity 2 | 15         | 20       | 40          | 22.5            |
++------------+------------+----------+-------------+-----------------+
 
-Activity | Optimistic | Most probable | Pessimistic | PERT estimate
-Activity 1 |   6   |   10  |  15  | 10.166667
-Activity 2 |   18   |   25  |  39  | 16.166667
-TOTAL  |   |    |    |    96
+TOTAL: 42.5
 ```
 
 
