@@ -20,8 +20,8 @@ pub struct Report {
 }
 
 impl Report {
-    pub fn new (pert: Pert) -> Self {
-        Self{ pert }
+    pub fn new(pert: Pert) -> Self {
+        Self { pert }
     }
 
     pub fn table(&mut self) -> String {

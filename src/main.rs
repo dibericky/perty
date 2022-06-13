@@ -1,4 +1,4 @@
-use perty::modules::{activity::Activity, pert::Pert, view::Report, storage::MemoryStorage};
+use perty::modules::{activity::Activity, pert::Pert, storage::MemoryStorage, view::Report};
 
 fn main() {
     println!("Hello, welcome to Perty!");

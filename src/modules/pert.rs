@@ -20,14 +20,12 @@ impl Pert {
         self
     }
 
-    pub fn get_activities (&mut self) -> Result<Vec<&Activity>> {
-        self.activities
-            .get_activities(&self.name)
+    pub fn get_activities(&mut self) -> Result<Vec<&Activity>> {
+        self.activities.get_activities(&self.name)
     }
 
     pub fn estimated_total(&mut self) -> f64 {
-        self
-            .get_activities()
+        self.get_activities()
             .unwrap()
             .iter()
             .map(|activity| activity.estimated())
@@ -37,7 +35,7 @@ impl Pert {
 
 #[cfg(test)]
 mod test {
-    use crate::modules::storage::{MemoryStorage};
+    use crate::modules::storage::MemoryStorage;
 
     use super::*;
 
@@ -54,10 +52,7 @@ mod test {
 
         let activity0 = Activity::new("activity 0".to_string(), 0, 10, 30);
         let activity = Activity::new("activity 1".to_string(), 10, 20, 30);
-        let expected = vec![
-            &activity0,
-            &activity
-        ];
+        let expected = vec![&activity0, &activity];
 
         assert_eq!(pert.name, "example".to_string());
         assert_eq!(pert.get_activities().unwrap(), expected);
