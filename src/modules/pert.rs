@@ -1,26 +1,34 @@
-use super::activity::Activity;
+use anyhow::Result;
 
-#[derive(Debug, PartialEq)]
+use super::{activity::Activity, storage::Storage};
+
 pub struct Pert {
     pub name: String,
-    pub activities: Vec<Activity>,
+    pub activities: Box<dyn Storage>,
 }
 
 impl Pert {
-    pub fn new(name: String) -> Self {
+    pub fn new(name: String, storage: Box<dyn Storage>) -> Self {
         Self {
             name,
-            activities: Vec::default(),
+            activities: storage,
         }
     }
 
     pub fn add_activity(&mut self, activity: Activity) -> &mut Self {
-        self.activities.push(activity);
+        self.activities.add_activity(&self.name, activity).unwrap();
         self
     }
 
-    pub fn estimated_total(&self) -> f64 {
+    pub fn get_activities (&mut self) -> Result<Vec<&Activity>> {
         self.activities
+            .get_activities(&self.name)
+    }
+
+    pub fn estimated_total(&mut self) -> f64 {
+        self
+            .get_activities()
+            .unwrap()
             .iter()
             .map(|activity| activity.estimated())
             .sum()
@@ -29,39 +37,36 @@ impl Pert {
 
 #[cfg(test)]
 mod test {
+    use crate::modules::storage::{MemoryStorage};
+
     use super::*;
 
     #[test]
-    fn create_new_pert() {
-        let pert = Pert::new("example".to_string());
-        assert_eq!(
-            pert,
-            Pert {
-                name: "example".to_string(),
-                activities: vec![]
-            }
-        )
-    }
-
-    #[test]
     fn add_activity() {
-        let mut pert = Pert::new("example".to_string());
+        let mut storage = MemoryStorage::new();
+        let activity0 = Activity::new("activity 0".to_string(), 0, 10, 30);
+        storage.add_activity("example", activity0).unwrap();
+
+        let mut pert = Pert::new("example".to_string(), Box::new(storage));
         // let activity
         let activity = Activity::new("activity 1".to_string(), 10, 20, 30);
         pert.add_activity(activity);
 
-        assert_eq!(
-            pert,
-            Pert {
-                name: "example".to_string(),
-                activities: vec![Activity::new("activity 1".to_string(), 10, 20, 30)]
-            }
-        )
+        let activity0 = Activity::new("activity 0".to_string(), 0, 10, 30);
+        let activity = Activity::new("activity 1".to_string(), 10, 20, 30);
+        let expected = vec![
+            &activity0,
+            &activity
+        ];
+
+        assert_eq!(pert.name, "example".to_string());
+        assert_eq!(pert.get_activities().unwrap(), expected);
     }
 
     #[test]
     fn estimated_total() {
-        let mut pert = Pert::new("example".to_string());
+        let storage = MemoryStorage::new();
+        let mut pert = Pert::new("example".to_string(), Box::new(storage));
         pert.add_activity(Activity::new("activity 1".to_string(), 6, 10, 15))
             .add_activity(Activity::new("activity 2".to_string(), 18, 25, 39))
             .add_activity(Activity::new("activity 3".to_string(), 14, 22, 35))

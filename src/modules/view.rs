@@ -24,11 +24,12 @@ impl Report {
         Self{ pert }
     }
 
-    pub fn table(&self) -> String {
+    pub fn table(&mut self) -> String {
         let rows: Vec<Row> = self
             .pert
-            .activities
-            .iter()
+            .get_activities()
+            .unwrap()
+            .into_iter()
             .map(|activity| Row {
                 name: activity.name.to_owned(),
                 pessimistic: activity.estimation.pessimistic,
@@ -38,7 +39,7 @@ impl Report {
             })
             .collect();
         let rows_str = rows.with_title().display().unwrap().to_string();
-        
+
         format!("{}\nTOTAL: {}", rows_str, self.pert.estimated_total())
     }
 }
@@ -46,17 +47,18 @@ impl Report {
 #[cfg(test)]
 mod test {
     use super::Report;
-    use crate::modules::{activity::Activity, pert::Pert};
+    use crate::modules::{activity::Activity, pert::Pert, storage::MemoryStorage};
 
     #[test]
     fn table() {
-        let mut pert = Pert::new("example".to_string());
+        let storage = MemoryStorage::new();
+        let mut pert = Pert::new("example".to_string(), Box::new(storage));
         pert.add_activity(Activity::new("activity 1".to_string(), 6, 10, 15))
             .add_activity(Activity::new("activity 2".to_string(), 18, 25, 39))
             .add_activity(Activity::new("activity 3".to_string(), 14, 22, 35))
             .add_activity(Activity::new("activity 4".to_string(), 23, 34, 62));
 
-        let report = Report { pert };
+        let mut report = Report { pert };
         insta::assert_display_snapshot!(report.table());
     }
 }
