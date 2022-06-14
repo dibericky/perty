@@ -54,4 +54,24 @@ Name: Marketplace
 TOTAL: 42.5
 ```
 
+## PostgreSQL
+
+```
+CREATE TABLE public.pert (
+	"name" varchar NOT NULL,
+	id serial4 NOT NULL,
+	CONSTRAINT pert_pk PRIMARY KEY (id)
+);
+
+CREATE TABLE public.activities (
+	pert_id serial4 NOT NULL,
+	pessimistic int4 NOT NULL,
+	probable int4 NOT NULL,
+	optimistic int4 NOT NULL,
+	id serial4 NOT NULL,
+	CONSTRAINT activities_pk PRIMARY KEY (id),
+	CONSTRAINT activities_fk FOREIGN KEY (pert_id) REFERENCES public.pert(id) ON DELETE CASCADE
+);
+
+```
 

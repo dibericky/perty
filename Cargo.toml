@@ -8,4 +8,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.57"
 cli-table= "0.4.7"
+dotenv = "0.15.0"
 insta = "1.14.1"
+postgres = "0.19.3"
+toiletdb = "0.1.2"

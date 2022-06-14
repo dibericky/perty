@@ -1,4 +1,7 @@
-use super::pert::Pert;
+use super::{
+    activity::{Activity, EstimationValue},
+    pert::Pert,
+};
 use cli_table::{format::Justify, Table, WithTitle};
 
 #[derive(Table)]
@@ -6,30 +9,43 @@ struct Row {
     #[table(title = "Activity", justify = "Justify::Right")]
     name: String,
     #[table(title = "Optimistic")]
-    optimistic: u32,
+    optimistic: EstimationValue,
     #[table(title = "Probable")]
-    probable: u32,
+    probable: EstimationValue,
     #[table(title = "Pessimistic")]
-    pessimistic: u32,
+    pessimistic: EstimationValue,
     #[table(title = "PERT estimation")]
     pert: f64,
 }
 
-pub struct Report {
+struct PertWithActivities {
     pert: Pert,
+    activities: Vec<Activity>,
+}
+pub struct Report {
+    data: PertWithActivities,
 }
 
 impl Report {
-    pub fn new(pert: Pert) -> Self {
-        Self { pert }
+    pub fn new(pert: Pert, activities: Vec<Activity>) -> Self {
+        Self {
+            data: PertWithActivities { pert, activities },
+        }
+    }
+
+    fn estimated_total(&self) -> f64 {
+        self.data
+            .activities
+            .iter()
+            .map(|activity| activity.estimated())
+            .sum()
     }
 
     pub fn table(&mut self) -> String {
         let rows: Vec<Row> = self
-            .pert
-            .get_activities()
-            .unwrap()
-            .into_iter()
+            .data
+            .activities
+            .iter()
             .map(|activity| Row {
                 name: activity.name.to_owned(),
                 pessimistic: activity.estimation.pessimistic,
@@ -40,25 +56,31 @@ impl Report {
             .collect();
         let rows_str = rows.with_title().display().unwrap().to_string();
 
-        format!("{}\nTOTAL: {}", rows_str, self.pert.estimated_total())
+        format!(
+            "Project: {}\n\n{}\nTOTAL: {}",
+            self.data.pert.name,
+            rows_str,
+            self.estimated_total()
+        )
     }
 }
 
 #[cfg(test)]
 mod test {
     use super::Report;
-    use crate::modules::{activity::Activity, pert::Pert, storage::MemoryStorage};
+    use crate::modules::{activity::Activity, pert::Pert};
 
     #[test]
     fn table() {
-        let storage = MemoryStorage::new();
-        let mut pert = Pert::new("example".to_string(), Box::new(storage));
-        pert.add_activity(Activity::new("activity 1".to_string(), 6, 10, 15))
-            .add_activity(Activity::new("activity 2".to_string(), 18, 25, 39))
-            .add_activity(Activity::new("activity 3".to_string(), 14, 22, 35))
-            .add_activity(Activity::new("activity 4".to_string(), 23, 34, 62));
+        let pert = Pert::new(1, "example".to_string());
+        let activities = vec![
+            Activity::new("activity 1".to_string(), 6, 10, 15),
+            Activity::new("activity 2".to_string(), 18, 25, 39),
+            Activity::new("activity 3".to_string(), 14, 22, 35),
+            Activity::new("activity 4".to_string(), 23, 34, 62),
+        ];
 
-        let mut report = Report { pert };
+        let mut report = Report::new(pert, activities);
         insta::assert_display_snapshot!(report.table());
     }
 }

@@ -1,8 +1,10 @@
+pub type EstimationValue = i32;
+
 #[derive(Debug, PartialEq)]
 pub struct Estimation {
-    pub optimistic: u32,
-    pub probable: u32,
-    pub pessimistic: u32,
+    pub optimistic: EstimationValue,
+    pub probable: EstimationValue,
+    pub pessimistic: EstimationValue,
 }
 
 impl Estimation {
@@ -21,7 +23,12 @@ pub struct Activity {
 }
 
 impl Activity {
-    pub fn new(name: String, optimistic: u32, probable: u32, pessimistic: u32) -> Self {
+    pub fn new(
+        name: String,
+        optimistic: EstimationValue,
+        probable: EstimationValue,
+        pessimistic: EstimationValue,
+    ) -> Self {
         Self {
             name,
             estimation: Estimation {
