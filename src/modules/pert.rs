@@ -2,7 +2,7 @@ pub type PertId = i32;
 
 #[derive(Debug)]
 pub struct Pert {
-    id: PertId,
+    pub id: PertId,
     pub name: String,
 }
 
@@ -11,4 +11,3 @@ impl Pert {
         Self { id, name }
     }
 }
-

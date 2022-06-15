@@ -7,8 +7,9 @@ use super::{
 };
 
 pub trait Storage {
-    fn add_pert(&mut self, pert_id: PertId, name: &str) -> Result<()>;
+    fn add_pert(&mut self, name: &str) -> Result<PertId>;
     fn get_pert(&mut self, pert_id: PertId) -> Result<Option<Pert>>;
+    fn get_perts(&mut self) -> Result<Vec<Pert>>;
     fn add_activity(&mut self, pert_id: PertId, activity: Activity) -> Result<()>;
     fn get_activities(&mut self, pert_id: PertId) -> Result<Vec<Activity>>;
 }
@@ -28,12 +29,13 @@ impl PostgresDb {
 impl Storage for PostgresDb {
     fn add_activity(&mut self, pert_id: PertId, activity: Activity) -> Result<()> {
         self.client.execute(
-            "INSERT INTO activities (pert_id, pessimistic, probable, optimistic) VALUES ($1, $2, $3, $4)",
+            "INSERT INTO activities (pert_id, name, pessimistic, probable, optimistic) VALUES ($1, $2, $3, $4, $5)",
             &[
                 &pert_id,
+                &activity.name,
                 &activity.estimation.pessimistic,
-                &activity.estimation.probable, 
-                &activity.estimation.optimistic, 
+                &activity.estimation.probable,
+                &activity.estimation.optimistic,
             ],
         )?;
 
@@ -69,13 +71,14 @@ impl Storage for PostgresDb {
         Ok(activities)
     }
 
-    fn add_pert(&mut self, pert_id: PertId, name: &str) -> Result<()> {
-        self.client.execute(
-            "INSERT INTO pert (id, name) VALUES ($1, $2)",
-            &[&pert_id, &name],
+    fn add_pert(&mut self, name: &str) -> Result<PertId> {
+        let response = self.client.query(
+            "INSERT INTO pert (name) VALUES ($1) RETURNING id as pert_id",
+            &[&name],
         )?;
+        let pert_id: PertId = response.get(0).unwrap().get("pert_id");
 
-        Ok(())
+        Ok(pert_id)
     }
 
     fn get_pert(&mut self, pert_id: PertId) -> Result<Option<Pert>> {
@@ -87,5 +90,14 @@ impl Storage for PostgresDb {
             Ok(row) => Some(Pert::new(pert_id, row.get("name"))),
         };
         Ok(res)
+    }
+
+    fn get_perts(&mut self) -> Result<Vec<Pert>> {
+        let res = self.client.query("SELECT * FROM pert", &[])?;
+        let perts = res
+            .iter()
+            .map(|row| Pert::new(row.get("id"), row.get("name")))
+            .collect();
+        Ok(perts)
     }
 }

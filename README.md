@@ -5,7 +5,7 @@
 As a user I can create a new PERT
 
 ```
-> perty create
+> cargo run create
 > Name: Marketplace
 ```
 
@@ -14,7 +14,7 @@ As a user I can create a new PERT
 As a user I can request the list of all available PERTs
 
 ```
-> perty list
+> cargo run list
 1: Marketplace
 2: Social Login
 3: Newsfeed
@@ -26,7 +26,7 @@ As a user I can request the list of all available PERTs
 As a user I can add a new activity with its estimation
 
 ```
-> perty edit 1 add activity
+> cargo run edit 1 add activity
 Add estimated cost:
 > Activity: Activity 2
 > Optimistic: 18
@@ -40,7 +40,7 @@ Add estimated cost:
 As a user I can get the detail of one of the available PERTs
 
 ```
-> perty get 1
+> cargo run get 1
 Name: Marketplace
 
 +------------+------------+----------+-------------+-----------------+
@@ -69,6 +69,7 @@ CREATE TABLE public.activities (
 	probable int4 NOT NULL,
 	optimistic int4 NOT NULL,
 	id serial4 NOT NULL,
+	"name" varchar NOT NULL,
 	CONSTRAINT activities_pk PRIMARY KEY (id),
 	CONSTRAINT activities_fk FOREIGN KEY (pert_id) REFERENCES public.pert(id) ON DELETE CASCADE
 );

@@ -1,6 +1,6 @@
 use super::{
     activity::{Activity, EstimationValue},
-    pert::Pert,
+    pert::{Pert, PertId},
 };
 use cli_table::{format::Justify, Table, WithTitle};
 
@@ -63,6 +63,25 @@ impl Report {
             self.estimated_total()
         )
     }
+}
+
+#[derive(Table)]
+struct ListRowPert {
+    #[table(title = "ID", justify = "Justify::Right")]
+    id: PertId,
+    #[table(title = "Name")]
+    name: String,
+}
+
+pub fn list_view(perts: Vec<Pert>) -> String {
+    let list: Vec<ListRowPert> = perts
+        .into_iter()
+        .map(|pert| ListRowPert {
+            id: pert.id,
+            name: pert.name,
+        })
+        .collect();
+    list.with_title().display().unwrap().to_string()
 }
 
 #[cfg(test)]
