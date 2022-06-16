@@ -1,6 +1,6 @@
 use anyhow::Result;
 use dotenv::dotenv;
-use perty::{modules::storage::PostgresDb, perty::Perty, perty_cli};
+use perty::{modules::storage::PostgresDb, perty::Perty, perty_cli::{Output, self}};
 use std::env;
 
 fn main() -> Result<(), anyhow::Error> {
@@ -25,9 +25,15 @@ fn main() -> Result<(), anyhow::Error> {
         },
         [a, b] => match a {
             x if *x == "get" => {
-                perty_cli::get_pert(perty, b.parse()?)?;
+                perty_cli::get_pert(perty, b.parse()?, Output::Console)?;
             }
             _ => panic!("unknown command {} {}", a, b),
+        },
+        [a, b, c] => match a {
+            x if *x == "get" && *c == "--html" => {
+                perty_cli::get_pert(perty, b.parse()?, Output::HTML)?;
+            }
+            _ => panic!("unknown command {} {} {}", a, b, c),
         },
         [a, b, c, d] => match a {
             x if *x == "edit" => {

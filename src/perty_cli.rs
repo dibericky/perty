@@ -1,10 +1,31 @@
-use anyhow::Result;
+use anyhow::{Result, Error};
+use tempfile::{tempdir};
 use std::io;
+use std::io::Write;
+use std::fs::File;
 
 use crate::{
     modules::{activity::Activity, pert::PertId, view::list_view},
     perty::Perty,
 };
+
+pub enum Output {
+    Console,
+    HTML
+}
+
+fn tmp_file_in_browser (content: String) -> Result<()> {
+    let dir = tempdir()?;
+
+    let file_path = dir.path().join("report.html");
+    let file_path_url = format!("file://{}", file_path.to_str().unwrap());
+    let mut temp_file = File::create(&file_path)?;
+    writeln!(temp_file, "{}", content)?;
+    webbrowser::open(&file_path_url).expect("Unable to open browser");
+    println!("Opened browser...");
+    
+    Ok(())
+}
 
 pub fn read_input() -> Result<String> {
     let mut buffer = String::new();
@@ -28,10 +49,16 @@ pub fn list_perts(mut perty: Perty) -> Result<()> {
     Ok(())
 }
 
-pub fn get_pert(mut perty: Perty, pert_id: PertId) -> Result<()> {
+pub fn get_pert(mut perty: Perty, pert_id: PertId, output: Output) -> Result<()> {
     println!("Getting list of PERTs...");
     if let Some(mut report) = perty.get_reporter(pert_id)? {
-        println!("{}", report.table());
+        match output {
+            Output::Console => println!("{}", report.table()),
+            Output::HTML => {
+                tmp_file_in_browser(report.table_html())?;
+            }
+        }
+       ;
     } else {
         println!("No PERT found with id {}", pert_id);
     }

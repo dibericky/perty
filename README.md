@@ -54,6 +54,12 @@ Name: Marketplace
 TOTAL: 42.5
 ```
 
+Or generate as HTML file
+
+```
+> cargo run get 1 --html
+```
+
 ## PostgreSQL
 
 ```

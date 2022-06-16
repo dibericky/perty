@@ -1,0 +1,25 @@
+<h2>{{pert_name}}</h2>
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Pessimistic</th>
+        <th>Probable</th>
+        <th>Optimistic</th>
+        <th>Pert</th>
+    </tr>
+    {% for activity in activities %}
+    <tr>
+        <td>{{activity.name}}</td>
+        <td>{{activity.pessimistic}}</td>
+        <td>{{activity.probable}}</td>
+        <td>{{activity.optimistic}}</td>
+        <td>{{activity.pert}}</td>
+    </tr>
+    {% endfor %}
+    <td span="2">
+        Total
+    </td>
+    <td span="2">
+        {{estimated_total}}
+    </td>
+</table>

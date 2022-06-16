@@ -3,8 +3,10 @@ use super::{
     pert::{Pert, PertId},
 };
 use cli_table::{format::Justify, Table, WithTitle};
+use serde::Serialize;
+use std::path::Path;
 
-#[derive(Table)]
+#[derive(Table, Serialize)]
 struct Row {
     #[table(title = "Activity", justify = "Justify::Right")]
     name: String,
@@ -41,8 +43,8 @@ impl Report {
             .sum()
     }
 
-    pub fn table(&mut self) -> String {
-        let rows: Vec<Row> = self
+    fn activities_rows(&self) -> Vec<Row> {
+        self
             .data
             .activities
             .iter()
@@ -53,7 +55,10 @@ impl Report {
                 optimistic: activity.estimation.optimistic,
                 pert: activity.estimated(),
             })
-            .collect();
+            .collect()
+    }
+    pub fn table(&mut self) -> String {
+        let rows: Vec<Row> = self.activities_rows();
         let rows_str = rows.with_title().display().unwrap().to_string();
 
         format!(
@@ -62,6 +67,24 @@ impl Report {
             rows_str,
             self.estimated_total()
         )
+    }
+
+    pub fn table_html(&mut self) -> String {
+        let activities_rows: Vec<Row> = self.activities_rows();
+
+        let path = Path::new("src/modules/templates/activities_rows.liquid");
+        let template = liquid::ParserBuilder::with_stdlib()
+            .build().unwrap()
+            .parse_file(path).unwrap();
+
+        let globals = liquid::object!({
+            "pert_name": self.data.pert.name,
+            "activities": activities_rows,
+            "estimated_total": self.estimated_total()
+        });
+
+        let output = template.render(&globals).unwrap();
+        format!("{}", output)
     }
 }
 
