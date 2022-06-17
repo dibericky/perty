@@ -1,0 +1,134 @@
+---
+source: src/modules/view.rs
+expression: report.table_html()
+---
+<html>
+    <head>
+        <style>
+            *{
+                box-sizing: border-box;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+            }
+            body{
+                font-family: Helvetica;
+                -webkit-font-smoothing: antialiased;
+                background: rgba( 71, 147, 227, 1);
+            }
+            h2{
+                text-align: center;
+                font-size: 18px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                color: white;
+                padding: 30px 0;
+            }
+
+            /* Table Styles */
+
+            .pert-wrapper {
+                margin: 10px 70px 70px;
+                display: flex;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            table {
+                box-shadow: 0px 35px 50px rgba( 0, 0, 0, 0.2 );
+                border-radius: 5px;
+                font-size: 12px;
+                font-weight: normal;
+                border: none;
+                border-collapse: collapse;
+                /* width: 100%; */
+                max-width: 100%;
+                white-space: nowrap;
+                background-color: white;
+            }
+
+            table td, table th {
+                text-align: center;
+                padding: 8px;
+            }
+
+            table td {
+                font-size: 12px;
+            }
+
+            table thead th {
+                color: #ffffff;
+                background: #4FC3A1;
+            }
+
+
+            table thead th:nth-child(odd) {
+                color: #ffffff;
+                background: #324960;
+            }
+
+            table tr:nth-child(even) {
+                background: #F8F8F8;
+            }
+
+            table tr:last-child td {
+                font-weight: bold
+            }
+            table tr:last-child, table tr:last-child td:first-child, table tr:last-child td:last-child {
+                border-radius: 0px 0px 5px 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="pert-wrapper">
+            <h2>example</h2>
+            <table>
+    <tr>
+        <th>Name</th>
+        <th>Optimistic</th>
+        <th>Probable</th>
+        <th>Pessimistic</th>
+        <th>Pert</th>
+    </tr>
+    
+    <tr>
+        <td>activity 1</td>
+        <td>6</td>
+        <td>10</td>
+        <td>15</td>
+        <td>10.166666666666666</td>
+    </tr>
+    
+    <tr>
+        <td>activity 2</td>
+        <td>18</td>
+        <td>25</td>
+        <td>39</td>
+        <td>26.166666666666664</td>
+    </tr>
+    
+    <tr>
+        <td>activity 3</td>
+        <td>14</td>
+        <td>22</td>
+        <td>35</td>
+        <td>22.833333333333332</td>
+    </tr>
+    
+    <tr>
+        <td>activity 4</td>
+        <td>23</td>
+        <td>34</td>
+        <td>62</td>
+        <td>36.83333333333333</td>
+    </tr>
+    
+    <td colspan="2">
+        Total
+    </td>
+    <td colspan="3">
+        95.99999999999999
+    </td>
+</table>
+        </div>
+    </body>
+</html>

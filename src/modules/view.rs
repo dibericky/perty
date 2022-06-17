@@ -5,7 +5,7 @@ use super::{
 use anyhow::Result;
 use cli_table::{format::Justify, Table, WithTitle};
 use serde::Serialize;
-use std::path::{Path, PathBuf};
+use std::path::{Path};
 
 type Partials = liquid::partials::EagerCompiler<liquid::partials::InMemorySource>;
 
@@ -151,5 +151,19 @@ mod test {
 
         let mut report = Report::new(pert, activities);
         insta::assert_display_snapshot!(report.table());
+    }
+
+    #[test]
+    fn table_html() {
+        let pert = Pert::new(1, "example".to_string());
+        let activities = vec![
+            Activity::new("activity 1".to_string(), 6, 10, 15),
+            Activity::new("activity 2".to_string(), 18, 25, 39),
+            Activity::new("activity 3".to_string(), 14, 22, 35),
+            Activity::new("activity 4".to_string(), 23, 34, 62),
+        ];
+
+        let mut report = Report::new(pert, activities);
+        insta::assert_display_snapshot!(report.table_html());
     }
 }

@@ -1,17 +1,17 @@
 <table>
     <tr>
         <th>Name</th>
-        <th>Pessimistic</th>
-        <th>Probable</th>
         <th>Optimistic</th>
+        <th>Probable</th>
+        <th>Pessimistic</th>
         <th>Pert</th>
     </tr>
     {% for activity in activities %}
     <tr>
         <td>{{activity.name}}</td>
-        <td>{{activity.pessimistic}}</td>
-        <td>{{activity.probable}}</td>
         <td>{{activity.optimistic}}</td>
+        <td>{{activity.probable}}</td>
+        <td>{{activity.pessimistic}}</td>
         <td>{{activity.pert}}</td>
     </tr>
     {% endfor %}
