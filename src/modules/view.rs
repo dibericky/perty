@@ -92,6 +92,30 @@ impl Report {
         )
     }
 
+    pub fn csv(&mut self) -> String {
+        let rows: Vec<Row> = self.activities_rows();
+        let mut csv_rows = 
+            vec![
+                vec!["Name".to_string(), "Optimistic".to_string(), "Probable".to_string(), "Pessimistic".to_string(), "PERT".to_string()]
+            ];
+
+        let mut body_rows = rows
+            .into_iter()
+            .map(|row| vec![row.name, row.optimistic.to_string(), row.probable.to_string(), row.pessimistic.to_string(), row.pert.to_string()])
+            .collect::<Vec<_>>();
+        
+        csv_rows.append(&mut body_rows);
+        csv_rows.push(vec!["Total".to_string(), "".to_string(), "".to_string(), "".to_string(), self.estimated_total().to_string()]);
+
+        let csv = csv_rows
+            .into_iter()
+            .map(|vec_row| vec_row.join(","))
+            .collect::<Vec<_>>()
+            .join("\n");
+        
+        format!("{}", csv)
+    }
+
     pub fn table_html(&mut self) -> String {
         let activities_rows: Vec<Row> = self.activities_rows();
 
@@ -165,5 +189,19 @@ mod test {
 
         let mut report = Report::new(pert, activities);
         insta::assert_display_snapshot!(report.table_html());
+    }
+
+    #[test]
+    fn table_csv() {
+        let pert = Pert::new(1, "example".to_string());
+        let activities = vec![
+            Activity::new("activity 1".to_string(), 6, 10, 15),
+            Activity::new("activity 2".to_string(), 18, 25, 39),
+            Activity::new("activity 3".to_string(), 14, 22, 35),
+            Activity::new("activity 4".to_string(), 23, 34, 62),
+        ];
+
+        let mut report = Report::new(pert, activities);
+        insta::assert_display_snapshot!(report.csv());
     }
 }

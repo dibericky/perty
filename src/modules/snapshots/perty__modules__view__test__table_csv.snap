@@ -1,0 +1,10 @@
+---
+source: src/modules/view.rs
+expression: report.csv()
+---
+Name,Optimistic,Probable,Pessimistic,PERT
+activity 1,6,10,15,10.166666666666666
+activity 2,18,25,39,26.166666666666664
+activity 3,14,22,35,22.833333333333332
+activity 4,23,34,62,36.83333333333333
+Total,,,,95.99999999999999

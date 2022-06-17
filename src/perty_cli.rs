@@ -10,15 +10,21 @@ use crate::{
 
 pub enum Output {
     Console,
-    HTML
+    HTML,
+    CSV
+}
+
+fn create_file(file_name: String, content: String) -> Result<String> {
+    let file_path = std::env::current_dir()?.join(file_name);
+    let mut temp_file = File::create(&file_path)?;
+    writeln!(temp_file, "{}", content)?;
+    Ok(file_path.to_str().unwrap().to_string())
 }
 
 fn file_in_browser (pert_id: PertId, content: String) -> Result<()> {
     let file_name = format!("report-{}.html", pert_id);
-    let file_path = std::env::current_dir()?.join(file_name);
-    let file_path_url = format!("file://{}", file_path.to_str().unwrap());
-    let mut temp_file = File::create(&file_path)?;
-    writeln!(temp_file, "{}", content)?;
+    let file_path = create_file(file_name, content)?;
+    let file_path_url = format!("file://{}", file_path);
     webbrowser::open(&file_path_url).expect("Unable to open browser");
     println!("Opened browser...");
     
@@ -54,6 +60,10 @@ pub fn get_pert(mut perty: Perty, pert_id: PertId, output: Output) -> Result<()>
             Output::Console => println!("{}", report.table()),
             Output::HTML => {
                 file_in_browser(pert_id, report.table_html())?;
+            },
+            Output::CSV => {
+                let file_name = format!("report-{}.csv", pert_id);
+                create_file(file_name, report.csv())?;
             }
         }
        ;

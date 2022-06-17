@@ -30,9 +30,16 @@ fn main() -> Result<(), anyhow::Error> {
             _ => panic!("unknown command {} {}", a, b),
         },
         [a, b, c] => match a {
-            x if *x == "get" && *c == "--html" => {
-                perty_cli::get_pert(perty, b.parse()?, Output::HTML)?;
-            }
+            x if *x == "get" && (*c == "--html" || c == "--csv") => {
+                perty_cli::get_pert(
+                    perty, b.parse()?,
+                    match c {
+                        x if x == "--html" => Output::HTML,
+                        x if x == "--csv" => Output::CSV,
+                        _ => panic!("unknown format {}", c)
+                    }
+                )?;
+            },
             _ => panic!("unknown command {} {} {}", a, b, c),
         },
         [a, b, c, d] => match a {

@@ -62,6 +62,11 @@ Or generate as HTML file
 
 A `report-PERT_ID.html` file will be created and automatically opened in the browser.
 
+Or generate as CSV file
+
+```
+> cargo run get 1 --csv
+```
 
 ## PostgreSQL
 
