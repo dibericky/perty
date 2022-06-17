@@ -2,9 +2,12 @@ use super::{
     activity::{Activity, EstimationValue},
     pert::{Pert, PertId},
 };
+use anyhow::Result;
 use cli_table::{format::Justify, Table, WithTitle};
 use serde::Serialize;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+
+type Partials = liquid::partials::EagerCompiler<liquid::partials::InMemorySource>;
 
 #[derive(Table, Serialize)]
 struct Row {
@@ -26,6 +29,26 @@ struct PertWithActivities {
 }
 pub struct Report {
     data: PertWithActivities,
+}
+
+fn get_partials() -> Result<Partials> {
+    let mut partials = Partials::empty();
+    let current_dir = std::env::current_dir().unwrap();
+    let relative_template_folder = "src/modules/templates/_includes".to_string();
+    let partials_folder_path = current_dir.join(relative_template_folder);
+    let folder_str = partials_folder_path.to_str().unwrap();
+    let paths = std::fs::read_dir(&folder_str).unwrap();
+    for entry in paths {
+        let entry = entry.unwrap();
+        let file_name = entry.file_name();
+        let file_name = file_name.to_str().unwrap();
+        let file_path = entry.path();
+        let file_path = file_path.to_str().unwrap();
+        let content = std::fs::read_to_string(file_path).expect("failed to read partial file");
+        partials.add(file_name, content);
+    }
+
+    Ok(partials)
 }
 
 impl Report {
@@ -72,10 +95,14 @@ impl Report {
     pub fn table_html(&mut self) -> String {
         let activities_rows: Vec<Row> = self.activities_rows();
 
-        let path = Path::new("src/modules/templates/activities_rows.liquid");
+        let partials = get_partials().unwrap();
+
+        let path = Path::new("src/modules/templates/report_pert.liquid");
         let template = liquid::ParserBuilder::with_stdlib()
-            .build().unwrap()
-            .parse_file(path).unwrap();
+            .partials(partials)
+            .build().unwrap();
+        
+        let template = template.parse_file(path).unwrap();
 
         let globals = liquid::object!({
             "pert_name": self.data.pert.name,
