@@ -1,5 +1,4 @@
-use anyhow::{Result, Error};
-use tempfile::{tempdir};
+use anyhow::{Result};
 use std::io;
 use std::io::Write;
 use std::fs::File;
@@ -14,10 +13,9 @@ pub enum Output {
     HTML
 }
 
-fn tmp_file_in_browser (content: String) -> Result<()> {
-    let dir = tempdir()?;
-
-    let file_path = dir.path().join("report.html");
+fn file_in_browser (pert_id: PertId, content: String) -> Result<()> {
+    let file_name = format!("report-{}.html", pert_id);
+    let file_path = std::env::current_dir()?.join(file_name);
     let file_path_url = format!("file://{}", file_path.to_str().unwrap());
     let mut temp_file = File::create(&file_path)?;
     writeln!(temp_file, "{}", content)?;
@@ -55,7 +53,7 @@ pub fn get_pert(mut perty: Perty, pert_id: PertId, output: Output) -> Result<()>
         match output {
             Output::Console => println!("{}", report.table()),
             Output::HTML => {
-                tmp_file_in_browser(report.table_html())?;
+                file_in_browser(pert_id, report.table_html())?;
             }
         }
        ;

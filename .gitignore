@@ -1,3 +1,4 @@
 /target
 .env
 !default.env
+report-*.html
