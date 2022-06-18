@@ -1,17 +1,17 @@
-use anyhow::{Result};
+use anyhow::Result;
+use std::fs::File;
 use std::io;
 use std::io::Write;
-use std::fs::File;
 
 use crate::{
-    modules::{activity::Activity, pert::PertId, view::list_view},
+    modules::{activity::Estimation, pert::PertId, view::list_view},
     perty::Perty,
 };
 
 pub enum Output {
     Console,
     HTML,
-    CSV
+    CSV,
 }
 
 fn create_file(file_name: String, content: String) -> Result<String> {
@@ -21,13 +21,13 @@ fn create_file(file_name: String, content: String) -> Result<String> {
     Ok(file_path.to_str().unwrap().to_string())
 }
 
-fn file_in_browser (pert_id: PertId, content: String) -> Result<()> {
+fn file_in_browser(pert_id: PertId, content: String) -> Result<()> {
     let file_name = format!("report-{}.html", pert_id);
     let file_path = create_file(file_name, content)?;
     let file_path_url = format!("file://{}", file_path);
     webbrowser::open(&file_path_url).expect("Unable to open browser");
     println!("Opened browser...");
-    
+
     Ok(())
 }
 
@@ -55,18 +55,26 @@ pub fn list_perts(mut perty: Perty) -> Result<()> {
 
 pub fn get_pert(mut perty: Perty, pert_id: PertId, output: Output) -> Result<()> {
     println!("Getting list of PERTs...");
-    if let Some(mut report) = perty.get_reporter(pert_id)? {
+    if let Some(report) = perty.get_reporter(pert_id)? {
         match output {
-            Output::Console => println!("{}", report.table()),
+            Output::Console => println!("{}", report.pert_detail().ascii()),
             Output::HTML => {
-                file_in_browser(pert_id, report.table_html())?;
-            },
+                file_in_browser(pert_id, report.pert_detail().html())?;
+            }
             Output::CSV => {
                 let file_name = format!("report-{}.csv", pert_id);
-                create_file(file_name, report.csv())?;
+                create_file(file_name, report.pert_detail().csv())?;
             }
-        }
-       ;
+        };
+    } else {
+        println!("No PERT found with id {}", pert_id);
+    }
+    Ok(())
+}
+
+pub fn add_dependency(mut perty: Perty, pert_id: PertId) -> Result<()> {
+    if let Some(mut report) = perty.get_reporter(pert_id)? {
+        println!("{}", report.list_activities());
     } else {
         println!("No PERT found with id {}", pert_id);
     }
@@ -83,7 +91,14 @@ pub fn add_activity(mut perty: Perty, pert_id: PertId) -> Result<()> {
     let probable = read_input()?.parse()?;
     println!("Pessimistic: ");
     let pessimistic = read_input()?.parse()?;
-    let activity = Activity::new(activity_name, optimistic, probable, pessimistic);
-    perty.add_activity(pert_id, activity)?;
+    perty.add_activity(
+        pert_id,
+        activity_name,
+        Estimation {
+            optimistic,
+            probable,
+            pessimistic,
+        },
+    )?;
     Ok(())
 }

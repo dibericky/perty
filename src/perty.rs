@@ -1,7 +1,7 @@
 use anyhow::Result;
 
 use crate::modules::{
-    activity::Activity,
+    activity::{Activity, Estimation},
     pert::{Pert, PertId},
     storage::Storage,
     view::Report,
@@ -28,8 +28,13 @@ impl Perty {
         self.storage.get_perts()
     }
 
-    pub fn add_activity(&mut self, pert_id: PertId, activity: Activity) -> Result<()> {
-        self.storage.add_activity(pert_id, activity)?;
+    pub fn add_activity(
+        &mut self,
+        pert_id: PertId,
+        name: String,
+        estimation: Estimation,
+    ) -> Result<()> {
+        self.storage.add_activity(pert_id, name, estimation)?;
         Ok(())
     }
 

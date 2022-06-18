@@ -68,6 +68,20 @@ Or generate as CSV file
 > cargo run get 1 --csv
 ```
 
+### Set dependencies between activities
+
+```
+> edit PERT_ID dependency
+1 activity name1
+2 activity name2
+3 activity name 3
+"A" depends on "B"
+Select activity "A":   
+> 2
+Select activity which depends on "activity name2": 
+> activity name3
+```
+
 ## PostgreSQL
 
 ```
@@ -87,6 +101,14 @@ CREATE TABLE public.activities (
 	CONSTRAINT activities_pk PRIMARY KEY (id),
 	CONSTRAINT activities_fk FOREIGN KEY (pert_id) REFERENCES public.pert(id) ON DELETE CASCADE
 );
+
+CREATE TABLE public.activity_dependencies (
+	activity_id_head int4 NOT NULL DEFAULT nextval('activity_dependencies_activity_id_a_seq'::regclass),
+	activity_id_tail int4 NOT NULL DEFAULT nextval('activity_dependencies_activity_id_b_seq'::regclass),
+	CONSTRAINT activity_dependencies_fk FOREIGN KEY (activity_id_head) REFERENCES public.activities(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT activity_dependencies_fk_1 FOREIGN KEY (activity_id_tail) REFERENCES public.activities(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 
 ```
 

@@ -1,3 +1,4 @@
+pub type ActivityId = i32;
 pub type EstimationValue = i32;
 
 #[derive(Debug, PartialEq)]
@@ -18,18 +19,21 @@ impl Estimation {
 
 #[derive(Debug, PartialEq)]
 pub struct Activity {
+    pub id: ActivityId,
     pub name: String,
     pub estimation: Estimation,
 }
 
 impl Activity {
     pub fn new(
+        id: ActivityId,
         name: String,
         optimistic: EstimationValue,
         probable: EstimationValue,
         pessimistic: EstimationValue,
     ) -> Self {
         Self {
+            id,
             name,
             estimation: Estimation {
                 optimistic,
@@ -50,7 +54,7 @@ mod test {
 
     #[test]
     fn get_estimated() {
-        let estimation = Activity::new("activity 1".to_string(), 6, 10, 15).estimated();
+        let estimation = Activity::new(1, "activity 1".to_string(), 6, 10, 15).estimated();
         assert_eq!(estimation, 10.166666666666666);
     }
 }

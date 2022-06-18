@@ -2,7 +2,7 @@ use anyhow::Result;
 use postgres::{Client, NoTls};
 
 use super::{
-    activity::Activity,
+    activity::{Activity, ActivityId, Estimation},
     pert::{Pert, PertId},
 };
 
@@ -10,8 +10,10 @@ pub trait Storage {
     fn add_pert(&mut self, name: &str) -> Result<PertId>;
     fn get_pert(&mut self, pert_id: PertId) -> Result<Option<Pert>>;
     fn get_perts(&mut self) -> Result<Vec<Pert>>;
-    fn add_activity(&mut self, pert_id: PertId, activity: Activity) -> Result<()>;
+    fn add_activity(&mut self, pert_id: PertId, name: String, estimation: Estimation)
+        -> Result<()>;
     fn get_activities(&mut self, pert_id: PertId) -> Result<Vec<Activity>>;
+    fn add_dependencies(&mut self, head: ActivityId, tail: ActivityId) -> Result<()>;
 }
 
 pub struct PostgresDb {
@@ -27,15 +29,20 @@ impl PostgresDb {
 }
 
 impl Storage for PostgresDb {
-    fn add_activity(&mut self, pert_id: PertId, activity: Activity) -> Result<()> {
+    fn add_activity(
+        &mut self,
+        pert_id: PertId,
+        name: String,
+        estimation: Estimation,
+    ) -> Result<()> {
         self.client.execute(
             "INSERT INTO activities (pert_id, name, pessimistic, probable, optimistic) VALUES ($1, $2, $3, $4, $5)",
             &[
                 &pert_id,
-                &activity.name,
-                &activity.estimation.pessimistic,
-                &activity.estimation.probable,
-                &activity.estimation.optimistic,
+                &name,
+                &estimation.pessimistic,
+                &estimation.probable,
+                &estimation.optimistic,
             ],
         )?;
 
@@ -61,6 +68,7 @@ impl Storage for PostgresDb {
             .into_iter()
             .map(|row| {
                 Activity::new(
+                    row.get("activity_id"),
                     row.get("activity_name"),
                     row.get("optimistic"),
                     row.get("probable"),
@@ -99,5 +107,17 @@ impl Storage for PostgresDb {
             .map(|row| Pert::new(row.get("id"), row.get("name")))
             .collect();
         Ok(perts)
+    }
+
+    fn add_dependencies(&mut self, head: ActivityId, tail: ActivityId) -> Result<()> {
+        self.client.execute(
+            "INSERT INTO activity_dependencies (activity_id_head, activity_id_tail) VALUES ($1, $2)",
+            &[
+                &head,
+                &tail,
+            ],
+        )?;
+
+        Ok(())
     }
 }
