@@ -1,11 +1,19 @@
 use anyhow::Result;
 use dotenv::dotenv;
 use perty::{
-    modules::storage::PostgresDb,
+    modules::{pert::PertId, storage::PostgresDb},
     perty::Perty,
     perty_cli::{self, Output},
 };
-use std::env;
+use std::env::{self, Args};
+
+fn assert_no_rest(args: &mut Args) {
+    let other = args.next();
+    if !other.is_none() {
+        let args_arr: Vec<String> = args.collect();
+        panic!("unknown command {}", args_arr.join(" "));
+    }
+}
 
 fn main() -> Result<(), anyhow::Error> {
     dotenv().expect("Unable to load environment variables");
@@ -16,54 +24,55 @@ fn main() -> Result<(), anyhow::Error> {
 
     let mut args = env::args();
     args.next();
-    let commands: Vec<String> = args.collect();
-    match &commands[..] {
-        [a] => match a {
-            x if *x == "create" => {
-                perty_cli::create_pert(perty)?;
-            }
-            x if *x == "list" => {
-                perty_cli::list_perts(perty)?;
-            }
-            _ => panic!("unknown command {}", a),
-        },
-        [a, b] => match a {
-            x if *x == "get" => {
-                perty_cli::get_pert(perty, b.parse()?, Output::Console)?;
-            }
-            _ => panic!("unknown command {} {}", a, b),
-        },
-        [a, b, c] => match a {
-            x if *x == "get" && (*c == "--html" || c == "--csv") => {
-                perty_cli::get_pert(
-                    perty,
-                    b.parse()?,
-                    match c {
-                        x if x == "--html" => Output::HTML,
-                        x if x == "--csv" => Output::CSV,
-                        _ => panic!("unknown format {}", c),
-                    },
-                )?;
-            }
-            x if *x == "edit" && *c == "dependency" => {
-                perty_cli::add_dependency(perty, b.parse()?)?;
-            }
-            _ => panic!("unknown command {} {} {}", a, b, c),
-        },
-        [a, b, c, d] => match a {
-            x if *x == "edit" => {
-                let operation = vec![c.to_string(), d.to_string()];
-                match operation.join(" ") {
-                    x if x == "add activity" => {
-                        perty_cli::add_activity(perty, b.parse()?)?;
-                    }
-                    _ => panic!("unknown command {} {} {} {}", a, b, c, d),
+
+    let operation = args.next().expect("invalid arguments");
+
+    match operation.as_str() {
+        "create" => {
+            assert_no_rest(&mut args);
+            perty_cli::create_pert(perty)?;
+        }
+        "list" => {
+            assert_no_rest(&mut args);
+            perty_cli::list_perts(perty)?;
+        }
+        "get" => {
+            let resource = args.next().expect("missing resource to create in command");
+            let mut output = Output::Console;
+            if let Some(format) = args.next() {
+                output = match format.as_str() {
+                    "--html" => Output::HTML,
+                    "--csv" => Output::CSV,
+                    _ => panic!("Unknown format {}", format),
                 }
             }
-            _ => panic!("unknown command {} {} {} {}", a, b, c, d),
-        },
-        _ => panic!("invalid arguments {:?}", commands),
-    };
+            perty_cli::get_pert(perty, resource.parse()?, output)?;
+        }
+        "edit" => {
+            let resource = args.next();
+            let resource = resource.expect("missing resource to create in command");
+            let pert_id: PertId = resource.parse()?;
+            let operation = args
+                .next()
+                .expect("missing operation to perform in command");
 
+            match operation.as_str() {
+                "add" => {
+                    let what_add = args.next().expect("Missing resource to add in command");
+                    match what_add.as_str() {
+                        "activity" => {
+                            perty_cli::add_activity(perty, pert_id)?;
+                        }
+                        "dependency" => {
+                            perty_cli::add_dependency(perty, pert_id)?;
+                        }
+                        _ => panic!("Unknown resource to add {}", what_add),
+                    }
+                }
+                _ => panic!("unknown operation {}", operation),
+            }
+        }
+        _ => panic!("invalid operation {}", operation),
+    }
     Ok(())
 }

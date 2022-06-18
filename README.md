@@ -71,7 +71,7 @@ Or generate as CSV file
 ### Set dependencies between activities
 
 ```
-> edit PERT_ID dependency
+> edit PERT_ID add dependency
 1 activity name1
 2 activity name2
 3 activity name 3
