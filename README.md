@@ -82,6 +82,16 @@ Insert the ID of activity "B":
 > activity name3
 ```
 
+Query for getting dependency tree:
+```sql
+select 
+	id as activity_id, activities.name as head_name, activity_id_head
+	from activities
+	full outer join activity_dependencies on activities.id  = activity_dependencies.activity_id_tail
+```
+
+If column `activity_id_head` is NULL, then that activity has no dependencies (so that activity can be made immediately).
+
 ## PostgreSQL
 
 ```
