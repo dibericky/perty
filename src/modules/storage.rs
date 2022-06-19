@@ -13,7 +13,7 @@ pub trait Storage {
     fn add_activity(&mut self, pert_id: PertId, name: String, estimation: Estimation)
         -> Result<()>;
     fn get_activities(&mut self, pert_id: PertId) -> Result<Vec<Activity>>;
-    fn add_dependencies(&mut self, head: ActivityId, tail: ActivityId) -> Result<()>;
+    fn add_dependency(&mut self, head: ActivityId, tail: ActivityId) -> Result<()>;
 }
 
 pub struct PostgresDb {
@@ -109,7 +109,7 @@ impl Storage for PostgresDb {
         Ok(perts)
     }
 
-    fn add_dependencies(&mut self, head: ActivityId, tail: ActivityId) -> Result<()> {
+    fn add_dependency(&mut self, head: ActivityId, tail: ActivityId) -> Result<()> {
         self.client.execute(
             "INSERT INTO activity_dependencies (activity_id_head, activity_id_tail) VALUES ($1, $2)",
             &[

@@ -73,10 +73,46 @@ pub fn get_pert(mut perty: Perty, pert_id: PertId, output: Output) -> Result<()>
 }
 
 pub fn add_dependency(mut perty: Perty, pert_id: PertId) -> Result<()> {
-    if let Some(mut report) = perty.get_reporter(pert_id)? {
-        println!("{}", report.list_activities());
-    } else {
+    let reporter = perty.get_reporter(pert_id)?;
+    if reporter.is_none() {
         println!("No PERT found with id {}", pert_id);
+        return Ok(());
+    }
+    println!("{}", reporter.unwrap().list_activities());
+    println!("\"A\" depends on \"B\"");
+    println!("Insert the ID of activity \"A\":");
+    let activities = perty.get_activities(pert_id)?;
+
+    let tail_id: PertId = read_input()?.parse()?;
+    let tail = activities
+        .iter()
+        .find(|act| (*act).id == tail_id)
+        .expect("Unable to find activity A");
+    let tail_name = &tail.name;
+    println!("Insert the ID of activity \"B\":");
+    let head_id: PertId = read_input()?.parse()?;
+    let head = activities
+        .iter()
+        .find(|act| act.id == head_id)
+        .expect("Unable to find activity B");
+    let head_name = &head.name;
+
+    println!(
+        "You are adding the following dependencies: \"{}\" depends on \"{}\"",
+        tail_name, head_name
+    );
+    println!("Are you sure? Y/N");
+    match read_input()?.as_str() {
+        "Y" => {
+            perty.add_dependency(head_id, tail_id)?;
+            println!("Dependency added");
+        }
+        "N" => {
+            println!("The dependency has NOT been added.");
+        }
+        _ => {
+            panic!("Unknown input, let's do nothing... Retry");
+        }
     }
     Ok(())
 }

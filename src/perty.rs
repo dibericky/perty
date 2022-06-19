@@ -38,6 +38,10 @@ impl Perty {
         Ok(())
     }
 
+    pub fn add_dependency(&mut self, head: PertId, tail: PertId) -> Result<()> {
+        self.storage.add_dependency(head, tail)?;
+        Ok(())
+    }
     pub fn get_activities(&mut self, pert_id: PertId) -> Result<Vec<Activity>> {
         self.storage.get_activities(pert_id)
     }

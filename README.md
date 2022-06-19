@@ -76,9 +76,9 @@ Or generate as CSV file
 2 activity name2
 3 activity name 3
 "A" depends on "B"
-Select activity "A":   
+Insert the ID of activity "A":   
 > 2
-Select activity which depends on "activity name2": 
+Insert the ID of activity "B": 
 > activity name3
 ```
 
@@ -105,6 +105,7 @@ CREATE TABLE public.activities (
 CREATE TABLE public.activity_dependencies (
 	activity_id_head int4 NOT NULL DEFAULT nextval('activity_dependencies_activity_id_a_seq'::regclass),
 	activity_id_tail int4 NOT NULL DEFAULT nextval('activity_dependencies_activity_id_b_seq'::regclass),
+	CONSTRAINT activity_dependencies_pk PRIMARY KEY (activity_id_head, activity_id_tail),
 	CONSTRAINT activity_dependencies_fk FOREIGN KEY (activity_id_head) REFERENCES public.activities(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT activity_dependencies_fk_1 FOREIGN KEY (activity_id_tail) REFERENCES public.activities(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
