@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Canvas tutorial</title>
+    <script>
+        const dependencies = [
+            { "name": "E2E Test", "id": 1, "head": 2 },
+            { "name": "Setup service", "id": 2, "head": null },
+            { "name": "Setup E2E", "id": 3, "head": null },
+            { "name": "Release in Prod", "id": 4, "head": 1 },
+            { "name": "Metrics Performance", "id": 5, "head": 1 },
+            { "name": "Create Social Page", "id": 6, "head": null },
+            { "name": "Marketing Advertisement", "id": 7, "head": 6 }
+        ]
+        const colors = [
+            'red',
+            'blue',
+            'green',
+            'grey',
+            'purple'
+        ]
+        function draw_block(ctx, x, y, dep, colors_map) {
+            let color = colors_map[dep.id] || colors_map[dep.head]
+            colors_map[dep.id] = color
+            let name_length = ctx.measureText(dep.name).width;
+            const width = Math.max(50, name_length + 20);
+            const height = 50;
+            let y_val = y * height + 10 * y;
+            ctx.font = "10px Georgia";
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y_val, width, height);
+            ctx.fillStyle = "rgb(0, 0, 0)";
+            ctx.fillText(dep.name, x + 10, y_val + height / 2);
+
+            let x_val = x + width + 20;
+            return x_val;
+        }
+        function draw_next_level(ctx, previous_level, deps, x, colors_map) {
+            const lev = deps.filter(({ head }) =>
+                previous_level === null
+                    ? head === null
+                    : previous_level.includes(head)
+            );
+            let x_s = lev.map((dep, i) => draw_block(ctx, x, 0 + i, dep, colors_map));
+
+            if (lev.length === 0) {
+                return;
+            }
+            let lev_indexes = lev.map(({ id }) => id);
+            let x_max = Math.max(...x_s)
+            return draw_next_level(ctx, lev_indexes, deps, x_max, colors_map);
+        }
+        function draw() {
+            const canvas = document.getElementById("tutorial");
+            if (canvas.getContext) {
+                const ctx = canvas.getContext("2d");
+                const rest_colors = [...colors]
+                const colors_map = Object.fromEntries(dependencies
+                    .map(({ id, head }) => {
+                        if (head !== null) {
+                            return null
+                        }
+                        const color = rest_colors.pop()
+                        return [id, color]
+                    })
+                    .filter(Boolean))
+                draw_next_level(ctx, null, dependencies, 0, colors_map);
+            }
+        }
+    </script>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body onload="draw()">
+    <canvas id="tutorial" width="600" height="200"></canvas>
+</body>
+
+</html>
