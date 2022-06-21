@@ -9,7 +9,7 @@ use std::env::{self, Args};
 
 fn assert_no_rest(args: &mut Args) {
     let other = args.next();
-    if !other.is_none() {
+    if other.is_some() {
         let args_arr: Vec<String> = args.collect();
         panic!("unknown command {}", args_arr.join(" "));
     }
@@ -20,7 +20,7 @@ fn main() -> Result<(), anyhow::Error> {
     println!("Hello, welcome to Perty!");
 
     let storage = PostgresDb::new()?;
-    let mut perty = Perty::new(Box::new(storage));
+    let perty = Perty::new(Box::new(storage));
 
     let mut args = env::args();
     args.next();

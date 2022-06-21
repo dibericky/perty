@@ -47,7 +47,7 @@ fn get_phases_recursive(
             None => (
                 Some(ActivitySum {
                     id: act.activity_id,
-                    name: act.head_name.to_owned(),
+                    name: act.head_name,
                 }),
                 None,
             ),
@@ -56,19 +56,18 @@ fn get_phases_recursive(
                     return (
                         Some(ActivitySum {
                             id: act.activity_id,
-                            name: act.head_name.to_owned(),
+                            name: act.head_name,
                         }),
                         None,
                     );
-                } else {
-                    return (None, Some(act));
                 }
+                (None, Some(act))
             }
         })
         .unzip();
 
-    let heads: Vec<ActivitySum> = heads.into_iter().filter_map(|n| n).collect();
-    let tails: Vec<ActivityWithRelatedDependencies> = tails.into_iter().filter_map(|n| n).collect();
+    let heads: Vec<ActivitySum> = heads.into_iter().flatten().collect();
+    let tails: Vec<ActivityWithRelatedDependencies> = tails.into_iter().flatten().collect();
 
     let head_ids: Vec<ActivityId> = heads.iter().map(|act| act.id).collect();
 

@@ -3,7 +3,7 @@ use serde::Serialize;
 
 use super::{
     activity::ActivityId,
-    roadmap::{ActivitySum, Phase, Roadmap},
+    roadmap::{ActivitySum, Roadmap},
 };
 
 #[derive(Table, Serialize)]
@@ -56,65 +56,6 @@ impl RoadmapReport {
         }
     }
 
-    // pub fn csv(&mut self) -> String {
-    //     let mut csv_rows = vec![vec![
-    //         "Name".to_string(),
-    //         "Optimistic".to_string(),
-    //         "Probable".to_string(),
-    //         "Pessimistic".to_string(),
-    //         "PERT".to_string(),
-    //     ]];
-
-    //     let mut body_rows = self
-    //         .rows
-    //         .iter()
-    //         .map(|row| {
-    //             vec![
-    //                 row.name.to_owned(),
-    //                 row.optimistic.to_string(),
-    //                 row.probable.to_string(),
-    //                 row.pessimistic.to_string(),
-    //                 row.pert.to_string(),
-    //             ]
-    //         })
-    //         .collect::<Vec<_>>();
-
-    //     csv_rows.append(&mut body_rows);
-    //     csv_rows.push(vec![
-    //         "Total".to_string(),
-    //         "".to_string(),
-    //         "".to_string(),
-    //         "".to_string(),
-    //         self.estimated_total.to_string(),
-    //     ]);
-
-    //     csv_rows
-    //         .into_iter()
-    //         .map(|vec_row| vec_row.join(","))
-    //         .collect::<Vec<_>>()
-    //         .join("\n")
-    // }
-
-    // pub fn html(&mut self) -> String {
-    //     let partials = get_partials().unwrap();
-
-    //     let path = Path::new("src/modules/templates/report_pert.liquid");
-    //     let template = liquid::ParserBuilder::with_stdlib()
-    //         .partials(partials)
-    //         .build()
-    //         .unwrap();
-
-    //     let template = template.parse_file(path).unwrap();
-
-    //     let globals = liquid::object!({
-    //         "pert_name": self.pert.name,
-    //         "activities": self.rows,
-    //         "estimated_total": self.estimated_total
-    //     });
-
-    //     template.render(&globals).unwrap()
-    // }
-
     pub fn ascii(&mut self) -> String {
         self.phases
             .iter()
@@ -122,7 +63,7 @@ impl RoadmapReport {
                 format!(
                     "Phase #{}\n{}",
                     phase.id,
-                    phase.activities.with_title().display().unwrap().to_string()
+                    phase.activities.with_title().display().unwrap()
                 )
             })
             .collect::<Vec<String>>()
