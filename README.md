@@ -72,25 +72,52 @@ Or generate as CSV file
 
 ```
 > edit PERT_ID add dependency
-1 activity name1
-2 activity name2
-3 activity name 3
+1 activity Foobar
+2 activity Lorem
+3 activity Ipsum
+4 activity Dolorem
 "A" depends on "B"
 Insert the ID of activity "A":   
 > 2
 Insert the ID of activity "B": 
-> activity name3
+> 3
 ```
 
-Query for getting dependency tree:
-```sql
-select 
-	id as activity_id, activities.name as head_name, activity_id_head
-	from activities
-	full outer join activity_dependencies on activities.id  = activity_dependencies.activity_id_tail
-```
+### Get Roadmap of PERT
 
-If column `activity_id_head` is NULL, then that activity has no dependencies (so that activity can be made immediately).
+Roadmap of a PERT is based on dependency between activities. 
+All activities put in a phase are indipendent between each other but each of them depends on an activity of the phase before.
+
+```
+> get PERT_ID pert
+
+Hello, welcome to Perty!
+Calculating roadmap for PERT 1
+Phase #1
++----+---------------------+
+| ID | Name                |
++----+---------------------+
+|  1 | activity Foobar     |
++----+---------------------+
+|  3 | activity Ipsum      |
++----+---------------------+
+
+
+Phase #2
++----+-------------------------+
+| ID | Name                    |
++----+-------------------------+
+|  2 | activity Lorem          |
++----+-------------------------+
+
+
+Phase #3
++----+------------------+
+| ID | Name             |
++----+------------------+
+|  4 | activity Dolorem |
++----+------------------+
+```
 
 ## PostgreSQL
 
