@@ -1,6 +1,6 @@
 ---
-source: src/modules/view.rs
-expression: report.table_html()
+source: src/modules/pert_report.rs
+expression: report.html()
 ---
 <html>
     <head>

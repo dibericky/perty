@@ -1,5 +1,5 @@
 ---
-source: src/modules/view.rs
+source: src/modules/pert_report.rs
 expression: report.csv()
 ---
 Name,Optimistic,Probable,Pessimistic,PERT

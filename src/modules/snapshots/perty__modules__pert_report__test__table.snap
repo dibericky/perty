@@ -1,6 +1,6 @@
 ---
-source: src/modules/view.rs
-expression: report.table()
+source: src/modules/pert_report.rs
+expression: report.ascii()
 ---
 Project: example
 
