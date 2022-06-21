@@ -26,11 +26,11 @@ struct PertWithActivities {
     pert: Pert,
     activities: Vec<Activity>,
 }
-pub struct Report {
+pub struct ActivityReport {
     data: PertWithActivities,
 }
 
-impl Report {
+impl ActivityReport {
     pub fn new(pert: Pert, activities: Vec<Activity>) -> Self {
         Self {
             data: PertWithActivities { pert, activities },

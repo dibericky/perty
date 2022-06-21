@@ -4,6 +4,7 @@ use postgres::{Client, NoTls};
 use super::{
     activity::{Activity, ActivityId, Estimation},
     pert::{Pert, PertId},
+    roadmap::ActivityWithRelatedDependencies,
 };
 
 pub trait Storage {
@@ -14,6 +15,10 @@ pub trait Storage {
         -> Result<()>;
     fn get_activities(&mut self, pert_id: PertId) -> Result<Vec<Activity>>;
     fn add_dependency(&mut self, head: ActivityId, tail: ActivityId) -> Result<()>;
+    fn get_activities_with_related_dependencies(
+        &mut self,
+        pert_id: PertId,
+    ) -> Result<Vec<ActivityWithRelatedDependencies>>;
 }
 
 pub struct PostgresDb {
@@ -119,5 +124,27 @@ impl Storage for PostgresDb {
         )?;
 
         Ok(())
+    }
+
+    fn get_activities_with_related_dependencies(
+        &mut self,
+        pert_id: PertId,
+    ) -> Result<Vec<ActivityWithRelatedDependencies>> {
+        let query = "
+        select 
+            id as activity_id, activities.name as head_name, activity_id_head
+            from activities
+            full outer join activity_dependencies on activities.id  = activity_dependencies.activity_id_tail
+        where pert_id = $1";
+        let res = self.client.query(query, &[&pert_id])?;
+        let acts = res
+            .into_iter()
+            .map(|row| ActivityWithRelatedDependencies {
+                activity_id_head: row.get("activity_id_head"),
+                head_name: row.get("head_name"),
+                activity_id: row.get("activity_id"),
+            })
+            .collect::<Vec<_>>();
+        Ok(acts)
     }
 }

@@ -20,7 +20,7 @@ fn main() -> Result<(), anyhow::Error> {
     println!("Hello, welcome to Perty!");
 
     let storage = PostgresDb::new()?;
-    let perty = Perty::new(Box::new(storage));
+    let mut perty = Perty::new(Box::new(storage));
 
     let mut args = env::args();
     args.next();
@@ -38,15 +38,32 @@ fn main() -> Result<(), anyhow::Error> {
         }
         "get" => {
             let resource = args.next().expect("missing resource to create in command");
-            let mut output = Output::Console;
-            if let Some(format) = args.next() {
-                output = match format.as_str() {
-                    "--html" => Output::HTML,
-                    "--csv" => Output::CSV,
-                    _ => panic!("Unknown format {}", format),
+            let pert_id: PertId = resource.parse()?;
+            match args.next().expect("unknown command").as_str() {
+                "pert" => {
+                    let mut output = Output::Console;
+                    if let Some(format) = args.next() {
+                        output = match format.as_str() {
+                            "--html" => Output::HTML,
+                            "--csv" => Output::CSV,
+                            _ => panic!("Unknown format {}", format),
+                        }
+                    }
+                    perty_cli::get_pert(perty, pert_id, output)?;
                 }
+                "roadmap" => {
+                    let mut output = Output::Console;
+                    if let Some(format) = args.next() {
+                        output = match format.as_str() {
+                            "--html" => Output::HTML,
+                            "--csv" => Output::CSV,
+                            _ => panic!("Unknown format {}", format),
+                        }
+                    }
+                    perty_cli::get_roadmap(perty, pert_id, output)?;
+                }
+                _ => panic!("Unknown command"),
             }
-            perty_cli::get_pert(perty, resource.parse()?, output)?;
         }
         "edit" => {
             let resource = args.next();

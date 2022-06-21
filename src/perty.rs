@@ -2,9 +2,11 @@ use anyhow::Result;
 
 use crate::modules::{
     activity::{Activity, Estimation},
+    activity_report::ActivityReport,
     pert::{Pert, PertId},
+    roadmap::Roadmap,
+    roadmap_report::RoadmapReport,
     storage::Storage,
-    view::Report,
 };
 
 pub struct Perty {
@@ -46,12 +48,24 @@ impl Perty {
         self.storage.get_activities(pert_id)
     }
 
-    pub fn get_reporter(&mut self, pert_id: PertId) -> Result<Option<Report>> {
+    pub fn get_activities_reporter(&mut self, pert_id: PertId) -> Result<Option<ActivityReport>> {
         let activities = self.get_activities(pert_id)?;
         let pert = self.get_pert(pert_id)?;
         match pert {
-            Some(pert) => Ok(Some(Report::new(pert, activities))),
+            Some(pert) => Ok(Some(ActivityReport::new(pert, activities))),
             None => Ok(None),
         }
+    }
+
+    pub fn get_roadmap_reporter(&self, roadmap: Roadmap) -> RoadmapReport {
+        RoadmapReport::new(roadmap)
+    }
+
+    pub fn get_roadmap(&mut self, pert_id: PertId) -> Result<Roadmap> {
+        let acts_with_deps = self
+            .storage
+            .get_activities_with_related_dependencies(pert_id)?;
+
+        Ok(Roadmap::new(acts_with_deps))
     }
 }

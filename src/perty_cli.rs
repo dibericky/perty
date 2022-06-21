@@ -4,7 +4,7 @@ use std::io;
 use std::io::Write;
 
 use crate::{
-    modules::{activity::Estimation, pert::PertId, view::list_view},
+    modules::{activity::Estimation, activity_report::list_view, pert::PertId},
     perty::Perty,
 };
 
@@ -55,7 +55,7 @@ pub fn list_perts(mut perty: Perty) -> Result<()> {
 
 pub fn get_pert(mut perty: Perty, pert_id: PertId, output: Output) -> Result<()> {
     println!("Getting list of PERTs...");
-    if let Some(report) = perty.get_reporter(pert_id)? {
+    if let Some(report) = perty.get_activities_reporter(pert_id)? {
         match output {
             Output::Console => println!("{}", report.pert_detail().ascii()),
             Output::HTML => {
@@ -73,7 +73,7 @@ pub fn get_pert(mut perty: Perty, pert_id: PertId, output: Output) -> Result<()>
 }
 
 pub fn add_dependency(mut perty: Perty, pert_id: PertId) -> Result<()> {
-    let reporter = perty.get_reporter(pert_id)?;
+    let reporter = perty.get_activities_reporter(pert_id)?;
     if reporter.is_none() {
         println!("No PERT found with id {}", pert_id);
         return Ok(());
@@ -136,5 +136,16 @@ pub fn add_activity(mut perty: Perty, pert_id: PertId) -> Result<()> {
             pessimistic,
         },
     )?;
+    Ok(())
+}
+
+pub fn get_roadmap(mut perty: Perty, pert_id: PertId, output: Output) -> Result<()> {
+    println!("Calculating roadmap for PERT {}", pert_id);
+    let roadmap = perty.get_roadmap(pert_id)?;
+    let mut report = perty.get_roadmap_reporter(roadmap);
+    match output {
+        Output::Console => println!("{}", report.ascii()),
+        _ => todo!(),
+    };
     Ok(())
 }

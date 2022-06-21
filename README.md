@@ -40,7 +40,7 @@ Add estimated cost:
 As a user I can get the detail of one of the available PERTs
 
 ```
-> cargo run get 1
+> cargo run get 1 pert
 Name: Marketplace
 
 +------------+------------+----------+-------------+-----------------+
@@ -57,7 +57,7 @@ TOTAL: 42.5
 Or generate as HTML file
 
 ```
-> cargo run get 1 --html
+> cargo run get 1 pert --html
 ```
 
 A `report-PERT_ID.html` file will be created and automatically opened in the browser.
@@ -65,7 +65,7 @@ A `report-PERT_ID.html` file will be created and automatically opened in the bro
 Or generate as CSV file
 
 ```
-> cargo run get 1 --csv
+> cargo run get 1 pert --csv
 ```
 
 ### Set dependencies between activities
