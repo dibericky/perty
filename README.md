@@ -1,4 +1,4 @@
-# Perty
+# PERTy
 
 ### Create a new PERT
 
