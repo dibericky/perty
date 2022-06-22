@@ -3,6 +3,7 @@ use postgres::{Client, NoTls};
 
 use super::{
     activity::{Activity, ActivityId, Estimation},
+    github::BoardId,
     pert::{Pert, PertId},
     roadmap::ActivityWithRelatedDependencies,
 };
@@ -19,6 +20,7 @@ pub trait Storage {
         &mut self,
         pert_id: PertId,
     ) -> Result<Vec<ActivityWithRelatedDependencies>>;
+    fn create_board(&mut self, pert_id: PertId, github_board_id: BoardId) -> Result<()>;
 }
 
 pub struct PostgresDb {
@@ -146,5 +148,14 @@ impl Storage for PostgresDb {
             })
             .collect::<Vec<_>>();
         Ok(acts)
+    }
+
+    fn create_board(&mut self, pert_id: PertId, github_board_id: BoardId) -> Result<()> {
+        self.client.execute(
+            "INSERT INTO boards (pert_id, github_board_id) VALUES ($1, $2)",
+            &[&pert_id, &github_board_id],
+        )?;
+
+        Ok(())
     }
 }

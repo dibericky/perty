@@ -20,7 +20,7 @@ fn main() -> Result<(), anyhow::Error> {
     println!("Hello, welcome to Perty!");
 
     let storage = PostgresDb::new()?;
-    let perty = Perty::new(Box::new(storage));
+    let mut perty = Perty::new(Box::new(storage));
 
     let mut args = env::args();
     args.next();
@@ -29,12 +29,27 @@ fn main() -> Result<(), anyhow::Error> {
 
     match operation.as_str() {
         "create" => {
-            assert_no_rest(&mut args);
-            perty_cli::create_pert(perty)?;
+            let resource = args.next();
+            if resource.is_none() {
+                return perty_cli::create_pert(perty);
+            }
+            let resource = resource.unwrap();
+            match resource.as_str() {
+                "board" => {
+                    let platform = args.next().expect("Missing platform argument");
+                    match platform.as_str() {
+                        "--github" => {
+                            perty_cli::create_board_github(perty)?;
+                        }
+                        _ => panic!("Unsupported argument"),
+                    }
+                }
+                _ => panic!("Invalid command"),
+            }
         }
         "list" => {
             assert_no_rest(&mut args);
-            perty_cli::list_perts(perty)?;
+            perty_cli::list_perts(&mut perty)?;
         }
         "get" => {
             let resource = args.next().expect("missing resource to create in command");

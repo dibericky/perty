@@ -119,6 +119,28 @@ Phase #3
 +----+------------------+
 ```
 
+## Github Integration
+
+In order to use these features you need to set `GITHUB_ACCESS_TOKEN` environment variable. Go [here](https://github.com/settings/tokens) to get your access token.
+
+### Create Project Board for PERT
+
+Read [here](https://docs.github.com/en/issues/organizing-your-work-with-project-boards/managing-project-boards/about-project-boards) for more information.
+
+
+```bash
+>create board --github
+1: Marketplace
+2: Social Login
+3: Newsfeed
+Select a PERT
+> 1
+Github repository url: (e.g.: https://github.com/dibericky/perty)
+> https://github.com/foobar/lorem
+Creating board...
+Board created: https://github.com/api-playground/projects-test/projects/1
+```
+
 ## PostgreSQL
 
 ```
@@ -147,6 +169,12 @@ CREATE TABLE public.activity_dependencies (
 	CONSTRAINT activity_dependencies_fk_1 FOREIGN KEY (activity_id_tail) REFERENCES public.activities(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE public.boards (
+	pert_id serial4 NOT NULL,
+	github_board_id serial4 NOT NULL,
+	CONSTRAINT boards_pk PRIMARY KEY (github_board_id, pert_id),
+	CONSTRAINT boards_fk FOREIGN KEY (pert_id) REFERENCES public.pert(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
 
 ```
 

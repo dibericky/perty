@@ -3,6 +3,7 @@ use anyhow::Result;
 use crate::modules::{
     activity::{Activity, Estimation},
     activity_report::ActivityReport,
+    github::BoardId,
     pert::{Pert, PertId},
     roadmap::Roadmap,
     roadmap_report::RoadmapReport,
@@ -67,5 +68,9 @@ impl Perty {
             .get_activities_with_related_dependencies(pert_id)?;
 
         Ok(Roadmap::new(acts_with_deps))
+    }
+    pub fn create_board(&mut self, pert_id: PertId, github_board_id: BoardId) -> Result<()> {
+        self.storage.create_board(pert_id, github_board_id)?;
+        Ok(())
     }
 }

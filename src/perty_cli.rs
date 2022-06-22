@@ -4,7 +4,12 @@ use std::io;
 use std::io::Write;
 
 use crate::{
-    modules::{activity::Estimation, activity_report::list_view, pert::PertId},
+    modules::{
+        activity::Estimation,
+        activity_report::list_view,
+        github::{get_owner_repo_from_url, Github},
+        pert::PertId,
+    },
     perty::Perty,
 };
 
@@ -46,7 +51,7 @@ pub fn create_pert(mut perty: Perty) -> Result<()> {
     Ok(())
 }
 
-pub fn list_perts(mut perty: Perty) -> Result<()> {
+pub fn list_perts(perty: &mut Perty) -> Result<()> {
     println!("Getting list of PERTs...");
     let perts = perty.get_perts()?;
     println!("{}", list_view(perts));
@@ -147,5 +152,25 @@ pub fn get_roadmap(mut perty: Perty, pert_id: PertId, output: Output) -> Result<
         Output::Console => println!("{}", report.ascii()),
         _ => todo!(),
     };
+    Ok(())
+}
+
+pub fn create_board_github(mut perty: Perty) -> Result<()> {
+    list_perts(&mut perty)?;
+    println!("Select a PERT");
+    let pert_id: PertId = read_input()?.parse().unwrap();
+    println!("Github repository url: (e.g.: https://github.com/dibericky/perty)");
+    let github_repo_url = read_input()?;
+    let (owner, repo) = get_owner_repo_from_url(&github_repo_url)?;
+    let board_name = perty.get_pert(pert_id)?.expect("PERT does not exist").name;
+    println!("Creating board...");
+    let token = std::env::var("GITHUB_ACCESS_TOKEN")?;
+    let github = Github::new(token);
+
+    let created_board = github.create_board(board_name, owner, repo)?;
+    perty.create_board(pert_id, created_board.id)?;
+
+    println!("Board created: {}", created_board.html_url);
+
     Ok(())
 }

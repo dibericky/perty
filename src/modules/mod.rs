@@ -1,5 +1,6 @@
 pub mod activity;
 pub mod activity_report;
+pub mod github;
 pub mod pert;
 pub mod pert_report;
 pub mod roadmap;
