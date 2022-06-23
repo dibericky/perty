@@ -141,7 +141,7 @@ Creating board...
 Board created: https://github.com/api-playground/projects-test/projects/1
 ```
 
-### Create PERT Task on Project Board
+### Create PERT Task on Project Board (Coming Soon)
 
 ```
 >create task --github
