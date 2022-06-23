@@ -141,6 +141,27 @@ Creating board...
 Board created: https://github.com/api-playground/projects-test/projects/1
 ```
 
+### Create PERT Task on Project Board
+
+```
+>create task --github
+List of projects with Github Board. Select one:
+1: Marketplace
+3: Newsfeed
+> 1
+Your task are creating... Please, wait...
+
+Creating task for: activity Foobar
+Task created: https://github.com/api-playground/projects-test/projects/2#card-83518444
+
+Creating task for: activity Lorem
+Task created: https://github.com/api-playground/projects-test/projects/2#card-83518445
+
+All task have been created.
+```
+
+
+
 ## PostgreSQL
 
 ```
