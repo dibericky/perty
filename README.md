@@ -5,7 +5,7 @@
 As a user I can create a new PERT
 
 ```
-> cargo run create
+> create
 > Name: Marketplace
 ```
 
@@ -14,7 +14,7 @@ As a user I can create a new PERT
 As a user I can request the list of all available PERTs
 
 ```
-> cargo run list
+> list
 1: Marketplace
 2: Social Login
 3: Newsfeed
@@ -26,7 +26,7 @@ As a user I can request the list of all available PERTs
 As a user I can add a new activity with its estimation
 
 ```
-> cargo run edit 1 add activity
+> edit 1 add activity
 Add estimated cost:
 > Activity: Activity 2
 > Optimistic: 18
@@ -40,7 +40,7 @@ Add estimated cost:
 As a user I can get the detail of one of the available PERTs
 
 ```
-> cargo run get 1 pert
+> get 1 pert
 Name: Marketplace
 
 +------------+------------+----------+-------------+-----------------+
@@ -57,7 +57,7 @@ TOTAL: 42.5
 Or generate as HTML file
 
 ```
-> cargo run get 1 pert --html
+> get 1 pert --html
 ```
 
 A `report-PERT_ID.html` file will be created and automatically opened in the browser.
@@ -65,7 +65,7 @@ A `report-PERT_ID.html` file will be created and automatically opened in the bro
 Or generate as CSV file
 
 ```
-> cargo run get 1 pert --csv
+> get 1 pert --csv
 ```
 
 ### Set dependencies between activities
@@ -128,7 +128,7 @@ In order to use these features you need to set `GITHUB_ACCESS_TOKEN` environment
 Read [here](https://docs.github.com/en/issues/organizing-your-work-with-project-boards/managing-project-boards/about-project-boards) for more information.
 
 
-```bash
+```
 >create board --github
 1: Marketplace
 2: Social Login
